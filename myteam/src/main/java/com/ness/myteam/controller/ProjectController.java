@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -127,7 +128,31 @@ public class ProjectController {
     
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public ResponseEntity<String> updateProject(@RequestBody ProjectDTO projectDTO) {
+    	if (projectDTO.getId() == null) {
+			LOGGER.info("No ID passed for project to be updated!");
+	        return new ResponseEntity<String>("No ID present", HttpStatus.PRECONDITION_FAILED);
+    	}
     	
+    	Project tempProject = projectRepository.findOne(projectDTO.getId());
+    	if (tempProject == null) {
+			LOGGER.info("No project found for given ID!" + projectDTO.getId());
+	        return new ResponseEntity<String>("No ID present", HttpStatus.PRECONDITION_FAILED);
+    	}
+    	
+    	if (!StringUtils.isEmpty(projectDTO.getName()) && !projectDTO.getName().equals(tempProject.getName())) {
+    		LOGGER.debug(String.format("Name is going to change from {} to {}", tempProject.getName(), projectDTO.getName()));
+    		tempProject.setName(projectDTO.getName());
+    	}
+    	
+    	if (!StringUtils.isEmpty(projectDTO.getDescription()) && !projectDTO.getDescription().equals(tempProject.getDescription())) {
+    		LOGGER.debug(String.format("Description is going to change from {} to {}", tempProject.getDescription(), projectDTO.getDescription()));
+    		tempProject.setDescription(projectDTO.getDescription());
+    	}
+    	
+    	if (!StringUtils.isEmpty(projectDTO.getActual()) && !projectDTO.getActual().equals(tempProject.getActual())) {
+    		LOGGER.debug(String.format("Description is going to change from {} to {}", tempProject.getActual(), projectDTO.getActual()));
+    		tempProject.setActual(projectDTO.getActual());
+    	}
     	
         return new ResponseEntity<String>("User Updated", HttpStatus.OK);
     }
