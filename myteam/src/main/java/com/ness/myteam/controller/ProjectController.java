@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ness.myteam.domain.Project;
 import com.ness.myteam.dto.ProjectDTO;
 import com.ness.myteam.repository.ProjectRepository;
+import com.ness.myteam.util.ValidationUtils;
 
 @Controller
 @RequestMapping("/api/project")
@@ -39,6 +41,9 @@ public class ProjectController {
 
 	@Autowired
 	private ProjectRepository projectRepository;
+	
+	@Autowired
+	private ValidationUtils validationUtils;
 	
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     public ResponseEntity<String> handleFileUpload(
@@ -111,19 +116,25 @@ public class ProjectController {
     
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public ResponseEntity<String> createProject(@RequestBody ProjectDTO projectDTO) {
-    	Project tempProject = projectRepository.findByName(projectDTO.getName());
-    	if (tempProject != null) {
-			LOGGER.warn("Project already exists: " + projectDTO.getName());
-	        return new ResponseEntity<String>("User already exist", HttpStatus.PRECONDITION_FAILED);
-    	}
+
     	
     	try {
+    		validationUtils.validateNotEmpty("name", projectDTO.getName());
+    		validationUtils.validateNotEmpty("actual", projectDTO.getActual());
+    		validationUtils.validateNotEmpty("validFrom", projectDTO.getValidFrom());
+    		
+        	Project tempProject = projectRepository.findByName(projectDTO.getName());
+        	if (tempProject != null) {
+    			LOGGER.warn("Project already exists: " + projectDTO.getName());
+    	        return new ResponseEntity<String>("Project already exist", HttpStatus.PRECONDITION_FAILED);
+        	}
+    		
 			projectRepository.save(build(projectDTO));
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			LOGGER.error("Unable to save user", e);
-	        return new ResponseEntity<String>("Failed to save user", HttpStatus.INTERNAL_SERVER_ERROR);
+	        return new ResponseEntity<String>("Failed to save project", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-        return new ResponseEntity<String>("User Created", HttpStatus.CREATED);
+        return new ResponseEntity<String>("Project Created", HttpStatus.CREATED);
     }
     
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
@@ -145,14 +156,31 @@ public class ProjectController {
     	}
     	
     	if (!StringUtils.isEmpty(projectDTO.getDescription()) && !projectDTO.getDescription().equals(tempProject.getDescription())) {
-    		LOGGER.debug(String.format("Description is going to change from {} to {}", tempProject.getDescription(), projectDTO.getDescription()));
+    		LOGGER.debug(String.format("Description is going to change from {} to {}", 
+    				tempProject.getDescription(), projectDTO.getDescription()));
     		tempProject.setDescription(projectDTO.getDescription());
     	}
     	
     	if (!StringUtils.isEmpty(projectDTO.getActual()) && !projectDTO.getActual().equals(tempProject.getActual())) {
-    		LOGGER.debug(String.format("Description is going to change from {} to {}", tempProject.getActual(), projectDTO.getActual()));
+    		LOGGER.debug(String.format("Actual flag is going to change from {} to {}", 
+    				tempProject.getActual(), projectDTO.getActual()));
     		tempProject.setActual(projectDTO.getActual());
     	}
+    	
+    	try {
+			if ( (tempProject.getValidTo() == null && !StringUtils.isEmpty(projectDTO.getValidTo()) ) || 
+					(!StringUtils.isEmpty(projectDTO.getValidTo()) && 
+							!DATE_OUT_FORMATER.parse(projectDTO.getValidTo()).equals(tempProject.getValidTo()) ) ) {
+				
+				Date newValidTo = DATE_OUT_FORMATER.parse(projectDTO.getValidTo());
+				LOGGER.debug(String.format("Valid to date is going to change from {} to {}", 
+						tempProject.getActual(), newValidTo));
+				tempProject.setValidTo(newValidTo);
+			}
+		} catch (ParseException e) {
+			// ignore, just log for now
+			LOGGER.error("Error while updating validTo date", e);
+		}
     	
         return new ResponseEntity<String>("User Updated", HttpStatus.OK);
     }

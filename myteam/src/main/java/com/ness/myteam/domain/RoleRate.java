@@ -28,9 +28,6 @@ public class RoleRate {
 
     @Column(name = "valid_to", nullable = true)
     private Date validTo;
-    
-    @Column(name = "actual", nullable = false)
-    private Boolean actual;
 	
     @Column(name = "currency", nullable = false)
     private String currency;
@@ -74,14 +71,6 @@ public class RoleRate {
 		this.validTo = validTo;
 	}
 
-	public Boolean getActual() {
-		return actual;
-	}
-
-	public void setActual(Boolean actual) {
-		this.actual = actual;
-	}
-
 	public String getCurrency() {
 		return currency;
 	}
@@ -108,7 +97,7 @@ public class RoleRate {
 
 	@Override
 	public String toString() {
-		return "RoleRate [actual=" + actual + ", currency=" + currency + ", value=" + value + "]";
+		return "RoleRate [currency=" + currency + ", value=" + value + "]";
 	}
 
 }

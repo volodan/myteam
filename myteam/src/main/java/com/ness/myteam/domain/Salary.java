@@ -32,10 +32,7 @@ public class Salary {
 
     @Column(name = "valid_to", nullable = true)
     private Date validTo;
-    
-    @Column(name = "actual", nullable = false)
-    private Boolean actual;
-	
+
     @Column(name = "approved", nullable = false)
     private Boolean approved;
     
@@ -81,14 +78,6 @@ public class Salary {
 		this.validTo = validTo;
 	}
 
-	public Boolean getActual() {
-		return actual;
-	}
-
-	public void setActual(Boolean actual) {
-		this.actual = actual;
-	}
-
 	public Boolean getApproved() {
 		return approved;
 	}
@@ -123,8 +112,8 @@ public class Salary {
 
 	@Override
 	public String toString() {
-		return "Salary [id=" + id + ", actual=" + actual + ", approved=" + approved + ", currency=" + currency
-				+ ", value=" + value + "]";
+		return "Salary [validFrom=" + validFrom + ", currency=" + currency + ", value=" + value + "]";
 	}
+
     
 }
