@@ -48,6 +48,9 @@ public class Position {
     @Column(name = "leave_date", nullable = true)
     private Date leaveDate;
     
+    @Column(name = "contractor", nullable = false)
+    private Boolean contractor;
+    
     // projection, when position should be hired
     @Column(name = "proposedJoinDate", nullable = true)
     private Date proposedJoinDate;
@@ -67,4 +70,117 @@ public class Position {
     @OneToMany(mappedBy = "position", fetch = FetchType.LAZY, 
     		cascade = CascadeType.ALL)
 	private List<PositionProject> positionProjects;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getFirstname() {
+		return firstname;
+	}
+
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
+	}
+
+	public String getSurname() {
+		return surname;
+	}
+
+	public void setSurname(String surname) {
+		this.surname = surname;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPersonalNumber() {
+		return personalNumber;
+	}
+
+	public void setPersonalNumber(String personalNumber) {
+		this.personalNumber = personalNumber;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+	public Date getJoinDate() {
+		return joinDate;
+	}
+
+	public void setJoinDate(Date joinDate) {
+		this.joinDate = joinDate;
+	}
+
+	public Date getLeaveDate() {
+		return leaveDate;
+	}
+
+	public void setLeaveDate(Date leaveDate) {
+		this.leaveDate = leaveDate;
+	}
+
+	public Date getProposedJoinDate() {
+		return proposedJoinDate;
+	}
+
+	public void setProposedJoinDate(Date proposedJoinDate) {
+		this.proposedJoinDate = proposedJoinDate;
+	}
+
+	public List<Salary> getSalaries() {
+		return salaries;
+	}
+
+	public void setSalaries(List<Salary> salaries) {
+		this.salaries = salaries;
+	}
+
+	public List<PositionJobRole> getPositionJobRoles() {
+		return positionJobRoles;
+	}
+
+	public void setPositionJobRoles(List<PositionJobRole> positionJobRoles) {
+		this.positionJobRoles = positionJobRoles;
+	}
+
+	public List<Billability> getBillabilities() {
+		return billabilities;
+	}
+
+	public void setBillabilities(List<Billability> billabilities) {
+		this.billabilities = billabilities;
+	}
+
+	public List<PositionProject> getPositionProjects() {
+		return positionProjects;
+	}
+
+	public void setPositionProjects(List<PositionProject> positionProjects) {
+		this.positionProjects = positionProjects;
+	}
+
+	public Boolean getContractor() {
+		return contractor;
+	}
+
+	public void setContractor(Boolean contractor) {
+		this.contractor = contractor;
+	}
+    
 }

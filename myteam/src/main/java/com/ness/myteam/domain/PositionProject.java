@@ -38,9 +38,6 @@ public class PositionProject {
 
     @Column(name = "valid_to", nullable = true)
     private Date validTo;
-    
-    @Column(name = "actual", nullable = false)
-    private Boolean actual;
 
 	public Integer getId() {
 		return id;
@@ -82,11 +79,4 @@ public class PositionProject {
 		this.validTo = validTo;
 	}
 
-	public Boolean getActual() {
-		return actual;
-	}
-
-	public void setActual(Boolean actual) {
-		this.actual = actual;
-	}
 }

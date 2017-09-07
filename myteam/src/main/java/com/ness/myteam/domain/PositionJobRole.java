@@ -33,9 +33,6 @@ public class PositionJobRole {
 
     @Column(name = "valid_to", nullable = true)
     private Date validTo;
-    
-    @Column(name = "actual", nullable = false)
-    private Boolean actual;
 
 	public Integer getId() {
 		return id;
@@ -77,16 +74,9 @@ public class PositionJobRole {
 		this.validTo = validTo;
 	}
 
-	public Boolean getActual() {
-		return actual;
-	}
-
-	public void setActual(Boolean actual) {
-		this.actual = actual;
-	}
 
 	@Override
 	public String toString() {
-		return "PositionJobRole [id=" + id + ", jobRole=" + jobRole + ", actual=" + actual + "]";
+		return "PositionJobRole [id=" + id + ", jobRole=" + jobRole + "]";
 	}
 }

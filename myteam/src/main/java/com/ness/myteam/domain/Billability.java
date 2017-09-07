@@ -29,9 +29,6 @@ public class Billability {
 
     @Column(name = "valid_to", nullable = true)
     private Date validTo;
-    
-    @Column(name = "actual", nullable = false)
-    private Boolean actual;
 
     @Column(name = "billable", nullable = false)
     private Boolean billable;
@@ -67,13 +64,6 @@ public class Billability {
 		this.validTo = validTo;
 	}
 
-	public Boolean getActual() {
-		return actual;
-	}
-
-	public void setActual(Boolean actual) {
-		this.actual = actual;
-	}
 
 	public Boolean getBillable() {
 		return billable;
