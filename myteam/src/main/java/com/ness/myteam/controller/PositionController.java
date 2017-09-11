@@ -5,13 +5,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +30,8 @@ import com.ness.myteam.domain.PositionProject;
 import com.ness.myteam.domain.Project;
 import com.ness.myteam.domain.RoleRate;
 import com.ness.myteam.domain.Salary;
+import com.ness.myteam.dto.PositionBaseDTO;
+import com.ness.myteam.dto.ProjectDTO;
 import com.ness.myteam.repository.BillabilityRepository;
 import com.ness.myteam.repository.JobRoleRepository;
 import com.ness.myteam.repository.PositionJobRoleRepository;
@@ -63,7 +70,7 @@ public class PositionController {
 	@Autowired
 	private PositionProjectRepository positionProjectRepository;
 	
-	@Autowired
+	@Autowired 
 	private PositionJobRoleRepository positionJobRoleRepository;
 	
     @RequestMapping(value = "/import", method = RequestMethod.POST)
@@ -163,5 +170,32 @@ public class PositionController {
         return new ResponseEntity<String>("Done", HttpStatus.OK);
 	}	
 
+    @RequestMapping(value = "/all/{month}/{year}", method = RequestMethod.GET)
+    public ResponseEntity<List<PositionBaseDTO>> listPositions(
+    		@PathVariable(required=true) Integer month, @PathVariable(required=true) Integer year) {
+    	
+    	Calendar startMonth = new GregorianCalendar();
+    	startMonth.set(year, month - 1, 1, 0, 0, 1);
 
+    	// has to do manually - cause end of month is dynamic
+    	Calendar endMonth = new GregorianCalendar();
+    	endMonth.set(Calendar.YEAR, year);
+    	endMonth.set(Calendar.MONTH, month -1);
+    	endMonth.set(Calendar.DAY_OF_MONTH, startMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
+    	endMonth.set(Calendar.HOUR_OF_DAY, 23);
+    	endMonth.set(Calendar.MINUTE, 59);
+    	endMonth.set(Calendar.SECOND, 59);
+
+    	LOGGER.debug("Loading employees/position data for period betweed " + 
+    			DATE_OUT_FORMATER.format(startMonth.getTime()) + " and " + DATE_OUT_FORMATER.format(endMonth.getTime()));
+    	
+    	// Calendar with date of month and year - start of month and end of month
+    	// joindate is < or projectedJoinDate < and leaver date is not null or > 
+    	// 
+    	
+    	List<ProjectDTO> projects = new ArrayList<>();
+
+    	
+        return new ResponseEntity<List<PositionBaseDTO>>(HttpStatus.OK);
+    }
 }
