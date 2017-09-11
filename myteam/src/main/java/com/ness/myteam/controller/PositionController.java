@@ -38,6 +38,7 @@ import com.ness.myteam.repository.PositionJobRoleRepository;
 import com.ness.myteam.repository.PositionProjectRepository;
 import com.ness.myteam.repository.PositionRepository;
 import com.ness.myteam.repository.ProjectRepository;
+import com.ness.myteam.repository.RoleRateRepository;
 import com.ness.myteam.repository.SalaryRepository;
 
 @Controller
@@ -51,9 +52,18 @@ public class PositionController {
 	private static final String CSV_DELIMITER = ",";
 	
 	private static final SimpleDateFormat DATE_OUT_FORMATER = new SimpleDateFormat(DATE_OUT_FORMAT);
+	
+	private static final Double OVERHEAD_EMPLOYEE = 590.0;
+	
+	private static final Double OVERHEAD_CONTRACTOR = 300.0;
+	
+	private static final Double SUPER_BRUTTO_COEF = 1.35;
 
 	@Autowired
 	private JobRoleRepository jobRoleRepository;
+	
+	@Autowired
+	private RoleRateRepository roleRateRepository;
 	
 	@Autowired
 	private PositionRepository positionRepository;
@@ -174,28 +184,81 @@ public class PositionController {
     public ResponseEntity<List<PositionBaseDTO>> listPositions(
     		@PathVariable(required=true) Integer month, @PathVariable(required=true) Integer year) {
     	
-    	Calendar startMonth = new GregorianCalendar();
-    	startMonth.set(year, month - 1, 1, 0, 0, 1);
-
-    	// has to do manually - cause end of month is dynamic
-    	Calendar endMonth = new GregorianCalendar();
-    	endMonth.set(Calendar.YEAR, year);
-    	endMonth.set(Calendar.MONTH, month -1);
-    	endMonth.set(Calendar.DAY_OF_MONTH, startMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
-    	endMonth.set(Calendar.HOUR_OF_DAY, 23);
-    	endMonth.set(Calendar.MINUTE, 59);
-    	endMonth.set(Calendar.SECOND, 59);
-
-    	LOGGER.debug("Loading employees/position data for period betweed " + 
-    			DATE_OUT_FORMATER.format(startMonth.getTime()) + " and " + DATE_OUT_FORMATER.format(endMonth.getTime()));
+	    	Calendar startMonth = new GregorianCalendar();
+	    	startMonth.set(year, month - 1, 1, 0, 0, 1);
+	
+	    	// has to do manually - cause end of month is dynamic
+	    	Calendar endMonth = new GregorianCalendar();
+	    	endMonth.set(Calendar.YEAR, year);
+	    	endMonth.set(Calendar.MONTH, month - 1);
+	    	endMonth.set(Calendar.DAY_OF_MONTH, startMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
+	    	endMonth.set(Calendar.HOUR_OF_DAY, 23);
+	    	endMonth.set(Calendar.MINUTE, 59);
+	    	endMonth.set(Calendar.SECOND, 59);
+	
+	    	LOGGER.debug("Loading employees/position data for period betweed " + 
+	    			DATE_OUT_FORMATER.format(startMonth.getTime()) + " and " + DATE_OUT_FORMATER.format(endMonth.getTime()));
+	    	
+	    	List<Position> positionsInMonth = positionRepository.findPositionsForMonthAndYear(startMonth.getTime(), endMonth.getTime());
+	    	
+	    	List<PositionBaseDTO> retPositions = new ArrayList<>();
+	    	for (Position position : positionsInMonth) {
+	    		PositionBaseDTO posDto = new PositionBaseDTO();
+	    		posDto.setEmail(position.getEmail());
+	    		posDto.setFirstname(position.getFirstname());
+	    		posDto.setLastname(position.getSurname());
+	    		posDto.setContractor(position.getContractor());
+	    		posDto.setJoinDate(position.getJoinDate() != null ? DATE_OUT_FORMATER.format(position.getJoinDate()) : null);
+	    		
+	    		List<Billability> bills = billabilityRepository.findBillabilityForPositionsMonthAndYear(startMonth.getTime(), endMonth.getTime(), position);
+	    		Billability bill = bills.size() > 0 ? bills.get(0) : null;
+	    		
+	    		// if is not billable, no other calculations make sense
+	    		if (bill != null) {
+	    			posDto.setBillable(bill.getBillable());
+	    			posDto.setBillablePercentage(bill.getPercentage());
+	    		}
+	    		
+	    		List<Salary> sals = salaryRepository.findSalaryForPositionsMonthAndYear(startMonth.getTime(), endMonth.getTime(), position);
+	    		Salary sal = sals.size() > 0 ? sals.get(0) : null;
+	    		if (sal != null) {
+	    			posDto.setSalary(sal.getValue()); // FIXME add currency
+	    		}
+	    		
+	    		List<PositionProject> pps = positionProjectRepository.findPositionProjectForPositionsMonthAndYear(startMonth.getTime(), endMonth.getTime(), position);
+	    		PositionProject pp = pps.size() > 0 ? pps.get(0) : null;
+	    		Project prj = pp!=null ? pp.getProject() : null;
+	    		
+	    		if (prj != null) {
+	    			posDto.setProject(prj.getName());
+	    		}
+	    		
+	    		List<PositionJobRole> pjrs = positionJobRoleRepository.findPositionJobRoleForPositionsMonthAndYear(startMonth.getTime(), endMonth.getTime(), position);
+	    		PositionJobRole pjr = pjrs.size() > 0 ? pjrs.get(0) : null;
+	    		JobRole jr = pjr!=null ? pjr.getJobRole() : null;
+	    		
+	    		if (jr != null) {
+	    			posDto.setJobRole(jr.getName());
+	    			
+	    			// makes sense only if job role is not null!
+		    		List<RoleRate> rrs = roleRateRepository.findRoleRateForJobRoleMonthAndYear(startMonth.getTime(), endMonth.getTime(), jr);
+		    		RoleRate rr = rrs.size() > 0 ? rrs.get(0) : null;
+		    		
+	    			posDto.setRate(rr != null ? rr.getValue() : null);
+	    		}
+	    		
+	    		// calculate COGS and GM - billability, salary and rate has to be non null!
+	    		if (posDto.getBillable() != null && posDto.getBillablePercentage() != null && posDto.getRate() != null && posDto.getSalary() != null && posDto.getContractor() != null) {
+	    			Double cogs = posDto.getSalary() * SUPER_BRUTTO_COEF + (posDto.getContractor().equals(Boolean.TRUE) ? OVERHEAD_CONTRACTOR : OVERHEAD_EMPLOYEE);
+	    			posDto.setCogs(cogs);
+	    			
+	    			Double gm = ( ( posDto.getBillable().equals(Boolean.TRUE) ? ( (posDto.getBillablePercentage()/100.0) * posDto.getRate() ) : 0.0 ) - cogs ) / posDto.getRate();
+	    			posDto.setGM(gm * 100.0);
+	    		}
+	    			    		
+	    		retPositions.add(posDto);
+	    	}
     	
-    	// Calendar with date of month and year - start of month and end of month
-    	// joindate is < or projectedJoinDate < and leaver date is not null or > 
-    	// 
-    	
-    	List<ProjectDTO> projects = new ArrayList<>();
-
-    	
-        return new ResponseEntity<List<PositionBaseDTO>>(HttpStatus.OK);
+        return new ResponseEntity<List<PositionBaseDTO>>(retPositions, HttpStatus.OK);
     }
 }

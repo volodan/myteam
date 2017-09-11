@@ -13,8 +13,8 @@ public interface PositionRepository extends CrudRepository<Position, Integer> {
 
 	public Position findByEmail(String email);
 	
-	@Query("select p from Position p where "
-			+ "(p.joinDate <= :#{#startDate} or p.validTo <= :#{#startDate}) "
-			+ "(rr.validFrom <= :#{#date} and rr.validTo > :#{#date}) order by rr.id desc")
-	List<Position> find(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+	@Query("SELECT p FROM Position p WHERE "
+			+ "( ( (p.joinDate is null OR p.joinDate <= :#{#startDate} ) OR ( p.proposedJoinDate is null OR p.proposedJoinDate <= :#{#startDate} ) ) "
+			+ "AND ( p.leaveDate is null OR p.leaveDate > :#{#endDate} ) ) order by p.surname asc")
+	List<Position> findPositionsForMonthAndYear(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 }
