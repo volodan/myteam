@@ -1,56 +1,59 @@
 var MonthYearPicker = React.createClass({
-	render: function() {
-		
+
+  render: function() {
 	var rows = [];
     for (var i = 1; i < 13; i++) {
         rows.push(<li id={i} onClick={this.handleClick.bind(null, i)}><a href='#'>{i}</a></li>);
     } 
-		
-    return (
-    		<div className="dropdown">
-    		  <button id="month" className="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Dropdown Example
-    		  <span className="selectd"></span></button>
-    		  <ul className="dropdown-menu">
-    		  	{rows}
-    		  </ul>  
-    		</div>
+	var actDate = new Date();
 
+    return (
+        <div>
+          <div className="dropdown">
+            <button id="month" className="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Selected month:&nbsp;
+            <span id="selectedMonthColumn" className="selected">{this.state.selectedMonth}</span></button>
+            <ul className="dropdown-menu">
+              {rows}
+            </ul>  
+          </div>
+
+          <PositionTable positions={this.state.positions}/>
+       </div>
     );
   },
 
   handleClick: function(text) {
-	  alert(text);
+    this.state.selectedMonth = text;
+    console.log("selected month: "+ this.state.selectedMonth);
+//    document.getElementById("selectedMonthColumn").textContent = this.state.selectedMonth;
+    this.loadPositionsFromServer();
   },
-	  
 
- /*
-  handleSubmit(e) {
-    e.preventDefault();
-    var newItem = {
-      text: this.state.text,
-      id: Date.now()
-    };
-    this.setState((prevState) => ({
-      items: prevState.items.concat(newItem),
-      text: ''
-    }));
-  }*/
-});
+  componentDidMount: function () {
+  	this.loadPositionsFromServer();
+  },
 
-
-
-
-
-var LoadData = React.createClass({
- 
+  getInitialState: function () {
+  	var actDate = new Date();
+  	return {selectedMonth: actDate.getMonth() +1, positions: []};
+  },
+  
   loadPositionsFromServer: function () {
     var self = this;
+	var positionDataUrl = "/api/position/all/" + this.state.selectedMonth + "/2017";
+	console.log("url: " + positionDataUrl);
     $.ajax({
-      url: "http://localhost:8080/api/position/all/10/2017"
+      url: positionDataUrl
     }).then(function (data) {
       self.setState({positions: data});
     });
   },
+});
+
+
+var LoadData = React.createClass({
+ 
+
  
   getInitialState: function () {
     return {positions: []};
@@ -116,6 +119,4 @@ var PositionTable = React.createClass({
    }
  });
  
-ReactDOM.render(<LoadData />, document.getElementById('data') );
 ReactDOM.render(<MonthYearPicker />, document.getElementById('picker') );
-
