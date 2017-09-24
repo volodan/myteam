@@ -1,0 +1,52 @@
+{
+    "version": "0.1.0",
+    "windows": {
+    },
+    "osx": {
+    },
+    "command": "mvn",
+    "isShellCommand": true,
+    "args": [
+        "-DskipTests"
+    ],
+    "showOutput": "always",
+    "tasks": [
+      {
+        "taskName": "clean"
+      },
+      {
+        "taskName": "compile"
+      },
+      {
+        "taskName": "test"
+      },
+      {
+        "taskName": "package"
+      },
+      {
+        "taskName": "verify"
+      },
+      {
+        "taskName": "spring-boot:run",
+        "args": [
+          "-Drun.profiles=dev"
+        ]
+      }
+    ],
+    "configurations": [
+        {
+            "name": "Java",
+            "type": "java",
+            "request": "launch",
+            "stopOnEntry": true,
+            "cwd": "${fileDirname}/myteam", // ${fileDirname}: the current opened file's dirname
+            "startupClass": "com.ness.myteam.${fileBasename}", // ${fileBasename}: the current opened file's basename
+            "options": [
+                "-classpath",
+                "${workspaceRoot}/target/classes" // ${fileDirname}: the current opened file's dirname
+            ],
+            "jdkPath": "/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/bin", // ${env.JAVA_HOME}: reference environment variables
+            "preLaunchTask": "compile"
+        }
+    ]
+  }

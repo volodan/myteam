@@ -28,19 +28,20 @@ public class RoleNumberPositionsDTO {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof RoleNumberPositionsDTO) {
-            if (o == null) {
-                return false;
-            } else {
+        if (o == null) {
+            return false;
+        } else {
+            if (o instanceof RoleNumberPositionsDTO) {
+
                 RoleNumberPositionsDTO dto = (RoleNumberPositionsDTO)o; 
                 if (!StringUtils.isEmpty(dto.getRoleName()) && !StringUtils.isEmpty(this.roleName) && dto.getRoleName().equals(this.roleName)) {
                     return true;
                 } else {
                     return false;
                 }
+            } else {
+                return false;
             }
-        } else {
-            return false;
         }
     }
 
