@@ -2,35 +2,20 @@
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
+    "version": "0.1.0",
     "configurations": [
-
         {
-            "name": "Java",
+            "name": "Java Remote",
+            "jdkPath": "/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/bin",
             "type": "java",
-            "request": "launch",
+            "request": "attach",
             "stopOnEntry": true,
-            "jdkPath": "/usr/bin",
-            "cwd": "${fileDirname}",
-            "startupClass": "${fileBasenameNoExtension}",
-            "classpath": [
-                ".",
-                "${fileDirname}"
-            ]
-        },
-        {
-            "name": "Java Console App",
-            "type": "java",
-            "request": "launch",
-            "stopOnEntry": true,
-            "jdkPath": "/usr/bin",
-            "cwd": "${fileDirname}",
-            "startupClass": "${fileBasenameNoExtension}",
-            "classpath": [
-                ".",
-                "${fileDirname}"
-            ],
-            "externalConsole": true
+            "cwd": "${workspaceRoot}/src/main/java",
+            "startupClass": "${relativeFile}",
+            "sourcePath": ["${workspaceRoot}/src/main/java"],
+            "classpath": ["${workspaceRoot}/target/classes"],
+            "remoteHost": "localhost",
+            "remotePort": 5005
         }
     ]
 }

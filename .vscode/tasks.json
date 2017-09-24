@@ -32,21 +32,5 @@
           "-Drun.profiles=dev"
         ]
       }
-    ],
-    "configurations": [
-        {
-            "name": "Java",
-            "type": "java",
-            "request": "launch",
-            "stopOnEntry": true,
-            "cwd": "${fileDirname}", // ${fileDirname}: the current opened file's dirname
-            "startupClass": "com.ness.myteam.${fileBasename}", // ${fileBasename}: the current opened file's basename
-            "options": [
-                "-classpath",
-                "${workspaceRoot}/target/classes" // ${fileDirname}: the current opened file's dirname
-            ],
-            "jdkPath": "/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/bin", // ${env.JAVA_HOME}: reference environment variables
-            "preLaunchTask": "compile"
-        }
     ]
-  }
+ }
