@@ -39,7 +39,7 @@
             "type": "java",
             "request": "launch",
             "stopOnEntry": true,
-            "cwd": "${fileDirname}/myteam", // ${fileDirname}: the current opened file's dirname
+            "cwd": "${fileDirname}", // ${fileDirname}: the current opened file's dirname
             "startupClass": "com.ness.myteam.${fileBasename}", // ${fileBasename}: the current opened file's basename
             "options": [
                 "-classpath",
