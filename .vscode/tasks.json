@@ -7,7 +7,8 @@
     "command": "mvn",
     "isShellCommand": true,
     "args": [
-        "-DskipTests"
+        "-DskipTests",
+        "-fmyteam/pom.xml"
     ],
     "showOutput": "always",
     "tasks": [
@@ -29,7 +30,8 @@
       {
         "taskName": "spring-boot:run",
         "args": [
-          "-Drun.profiles=dev"
+          " -Drun.profiles=dev"
+          
         ]
       }
     ]

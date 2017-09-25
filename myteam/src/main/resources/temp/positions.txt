@@ -1,0 +1,2 @@
+Vladislav.Jevcak@ness.com,Vladislav,Jevcak,EUR,3800,15.5.2010,true,100,EDC Manager,Perform EDC,false
+Tomas.Vasko@ness.com,Tomas,Vasko,EUR,2500,1.6.2010,true,100,Tech lead JAVA,CMS Editorial,false

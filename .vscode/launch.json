@@ -6,14 +6,14 @@
     "configurations": [
         {
             "name": "Java Remote",
-            "jdkPath": "/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/bin",
+            "jdkPath": "C:/Program Files/Java/jdk1.8.0_121/bin",
             "type": "java",
             "request": "attach",
             "stopOnEntry": true,
-            "cwd": "${workspaceRoot}/src/main/java",
+            "cwd": "${workspaceRoot}/myteam/src/main/java",
             "startupClass": "${relativeFile}",
-            "sourcePath": ["${workspaceRoot}/src/main/java"],
-            "classpath": ["${workspaceRoot}/target/classes"],
+            "sourcePath": ["${workspaceRoot}/myteam/src/main/java"],
+            "classpath": ["${workspaceRoot}/myteam/target/classes"],
             "remoteHost": "localhost",
             "remotePort": 5005
         }
